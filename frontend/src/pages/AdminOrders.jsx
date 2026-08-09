@@ -7,7 +7,7 @@ const statusPill = (status) => {
   const map = { pending: 'pill-muted', preparing: 'pill-success', out_for_delivery: 'pill-success', delivered: 'pill-success', cancelled: 'pill-danger' };
   return map[status] || 'pill-muted';
 };
-const statusLabel = (status) => status.replace(/_/g, ' ');
+const statusLabel = (status) => (status ? status.replace(/_/g, ' ') : 'Unknown');
 const NEXT_STATUS = { pending: 'preparing', preparing: 'out_for_delivery', out_for_delivery: 'delivered' };
 
 const AdminOrders = () => {
@@ -65,19 +65,23 @@ const AdminOrders = () => {
             <Reveal key={o._id} delay={Math.min(i * 30, 300)}>
               <div className="record-item glass">
                 <div className="record-header">
-                  <h3>Order #{o._id.slice(-6).toUpperCase()} — {o.user?.name}</h3>
+                  <h3>Order #{o._id.slice(-6).toUpperCase()} — {o.user?.name || 'Unknown user'}</h3>
                   <span className={`pill ${statusPill(o.status)}`}>{statusLabel(o.status)}</span>
                 </div>
-                <p className="course-meta">{new Date(o.createdAt).toLocaleString()} · {o.paymentMethod.toUpperCase()}</p>
+                <p className="course-meta">
+                  {o.createdAt ? new Date(o.createdAt).toLocaleString() : 'Unknown date'} · {(o.paymentMethod || 'N/A').toUpperCase()}
+                </p>
                 <ul className="order-items-list">
-                  {o.items.map((it, idx) => <li key={idx}>{it.name} × {it.quantity}</li>)}
+                  {(o.items || []).map((it, idx) => <li key={idx}>{it.name} × {it.quantity}</li>)}
                 </ul>
-                <p className="course-meta">Deliver to: {o.deliveryAddress}</p>
-                <p className="fee-tag">Total: ₹{o.totalAmount}</p>
+                <p className="course-meta">Deliver to: {o.deliveryAddress || 'N/A'}</p>
+                <p className="fee-tag">Total: ₹{o.totalAmount ?? 0}</p>
 
                 {!['delivered', 'cancelled'].includes(o.status) && (
                   <div className="owner-actions" style={{ marginTop: 10, marginLeft: 0 }}>
-                    <button onClick={() => handleAdvance(o)}>Advance to {statusLabel(NEXT_STATUS[o.status])}</button>
+                    {NEXT_STATUS[o.status] && (
+                      <button onClick={() => handleAdvance(o)}>Advance to {statusLabel(NEXT_STATUS[o.status])}</button>
+                    )}
                     <button className="danger" onClick={() => handleCancel(o._id)}>Cancel</button>
                   </div>
                 )}
