@@ -1,4 +1,4 @@
-# TastyBite — Food Ordering Website  ( MERN + JWT )
+# TastyBite — Food Ordering Website  
 
 ## Features
 - **Authentication**: JWT login/register, role toggle at signup (Customer / Restaurant Admin)
